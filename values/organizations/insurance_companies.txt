@@ -1,0 +1,35 @@
+# German health insurance companies
+AOK
+AOK Bayern
+AOK Baden-Württemberg
+AOK Nordost
+AOK Rheinland/Hamburg
+AOK Niedersachsen
+AOK Plus
+AOK Hessen
+AOK Nordwest
+Techniker Krankenkasse
+TK
+Barmer
+DAK-Gesundheit
+IKK classic
+IKK gesund plus
+IKK Südwest
+KKH Kaufmännische Krankenkasse
+HEK
+hkk
+Knappschaft
+BKK
+BKK Mobil Oil
+Pronova BKK
+Viactiv Krankenkasse
+SBK
+BIG direkt gesund
+Debeka
+DKV
+Allianz Private Krankenversicherung
+Signal Iduna
+Axa
+Continentale
+Gothaer
+HUK-Coburg

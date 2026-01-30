@@ -1,0 +1,30 @@
+Konsiliarische Beurteilung
+
+Anfordernde Abteilung: {{non_pii:department}}
+Datum: {{DATE_TIME:date}}
+
+Patient: {{PERSON:patient}}
+Geburtsdatum: {{DATE_TIME:birth}}
+Station: {{non_pii:ward}}
+
+Fragestellung: {{non_pii:diagnosis}}
+
+Anamnese:
+{{AGE:age}} Patient, seit {{non_pii:symptom_duration}} Beschwerden mit {{non_pii:symptoms}}. Einweisung durch {{PERSON:referring_doctor}}.
+
+Klinischer Befund:
+{{non_pii:finding}}
+
+Beurteilung:
+{{non_pii:assessment}}
+
+Empfehlung:
+{{non_pii:therapy}}
+
+Mit freundlichen Grüßen
+
+{{PERSON:attending_doctor}}
+Facharzt für {{non_pii:specialty}}
+LANR: {{DE_LANR:lanr}}
+
+Tel.: {{PHONE_NUMBER:hospital_phone}}

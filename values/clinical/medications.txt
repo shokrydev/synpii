@@ -1,0 +1,43 @@
+# German medications (common prescriptions)
+Ramipril 5mg
+Ramipril 10mg
+Metoprolol 47,5mg
+Metoprolol 95mg
+Bisoprolol 5mg
+Bisoprolol 10mg
+Amlodipin 5mg
+Amlodipin 10mg
+Simvastatin 20mg
+Simvastatin 40mg
+Atorvastatin 10mg
+Atorvastatin 20mg
+Metformin 500mg
+Metformin 850mg
+Metformin 1000mg
+L-Thyroxin 50µg
+L-Thyroxin 75µg
+L-Thyroxin 100µg
+Omeprazol 20mg
+Pantoprazol 40mg
+Ibuprofen 400mg
+Ibuprofen 600mg
+Diclofenac 50mg
+Diclofenac 75mg
+Paracetamol 500mg
+Aspirin 100mg
+Clopidogrel 75mg
+Amoxicillin 500mg
+Amoxicillin 1000mg
+Ciprofloxacin 250mg
+Ciprofloxacin 500mg
+Prednisolon 5mg
+Prednisolon 20mg
+Torasemid 10mg
+Furosemid 40mg
+Spironolacton 25mg
+Marcumar
+Xarelto 20mg
+Eliquis 5mg
+Salbutamol Spray
+Seretide 250µg
+Spiriva

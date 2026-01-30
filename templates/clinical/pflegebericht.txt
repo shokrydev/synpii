@@ -1,0 +1,24 @@
+Pflegebericht
+
+Datum: {{DATE_TIME:date}}
+Patient: {{PERSON:patient}}, geb. {{DATE_TIME:birth}}
+Station: {{non_pii:ward}}
+
+Pflegeanamnese:
+{{AGE:age}} Patient, aufgenommen am {{DATE_TIME:admission}} mit {{non_pii:diagnosis}}.
+Angehörige: {{PERSON:family_member}}, erreichbar unter {{PHONE_NUMBER:family_phone}}.
+Adresse: {{LOCATION:street}}, {{DE_POSTAL_CODE:plz}} {{LOCATION:city}}.
+
+Aktueller Zustand:
+{{non_pii:patient_ref}} zeigt sich kooperativ. Vitalzeichen: RR {{non_pii:bp_systolic}}/{{non_pii:bp_diastolic}}, Puls {{non_pii:pulse}}/min.
+Mobilisation mit Unterstützung möglich.
+
+Pflegerische Maßnahmen:
+- Medikamentengabe nach Anordnung
+- Wundversorgung am {{non_pii:wound_location}}
+- Mobilisation 2x täglich
+
+Besonderheiten:
+Keine.
+
+gez. Pflegefachkraft

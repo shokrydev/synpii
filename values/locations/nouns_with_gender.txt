@@ -1,0 +1,27 @@
+# German location nouns with gender and frequency
+# Format: word|gender|frequency
+# gender: m=masculine, f=feminine, n=neuter, pl=plural
+Wald|m|0.15
+Brücke|f|0.08
+Ufer|n|0.07
+Linden|pl|0.11
+Markt|m|0.12
+Kirche|f|0.10
+Wiese|f|0.08
+Garten|m|0.09
+Hof|m|0.07
+Berg|m|0.06
+Tal|n|0.05
+Bach|m|0.06
+See|m|0.05
+Turm|m|0.04
+Mühle|f|0.05
+Brunnen|m|0.04
+Kapelle|f|0.03
+Eiche|f|0.05
+Linde|f|0.06
+Birke|f|0.04
+Rose|f|0.05
+Rathaus|n|0.03
+Schloss|n|0.04
+Burg|f|0.04

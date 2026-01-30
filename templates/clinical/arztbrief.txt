@@ -1,0 +1,35 @@
+{{ORGANIZATION:hospital}}
+{{LOCATION:hospital_street}}
+{{DE_POSTAL_CODE:hospital_plz}} {{LOCATION:hospital_city}}
+
+Arztbrief
+
+Patient: {{PERSON:patient}}, geb. {{DATE_TIME:birth}}
+Anschrift: {{LOCATION:patient_street}}, {{DE_POSTAL_CODE:patient_plz}} {{LOCATION:patient_city}}
+Versichertennummer: {{DE_KVNR:kvnr}}
+
+Sehr geehrte Frau Kollegin, sehr geehrter Herr Kollege,
+
+wir berichten über unseren gemeinsamen Patienten {{PERSON:patient}}, der sich vom {{DATE_TIME:admission}} bis {{DATE_TIME:discharge}} in unserer stationären Behandlung befand.
+
+Diagnosen:
+1. {{non_pii:diagnosis_1}}
+2. {{non_pii:diagnosis_2}}
+
+Anamnese:
+Der {{AGE:age}} {{non_pii:patient_ref}} wurde uns von {{PERSON:referring_doctor}} aus {{LOCATION:referring_city}} zugewiesen. {{non_pii:patient_ref}} berichtete über seit {{non_pii:symptom_duration}} bestehende {{non_pii:symptoms}}. Die Beschwerden hätten während eines Aufenthalts in {{LOCATION:vacation_city}} begonnen.
+
+Befund bei Aufnahme:
+{{non_pii:admission_findings}}
+
+Therapie und Verlauf:
+{{non_pii:therapy}}
+
+Procedere:
+Ambulante Weiterbehandlung durch Sie. Wiedervorstellung bei uns in {{non_pii:followup_weeks}} Wochen. Bei Rückfragen erreichen Sie uns unter {{PHONE_NUMBER:hospital_phone}}.
+
+Mit freundlichen kollegialen Grüßen
+
+{{PERSON:attending_doctor}}
+{{non_pii:specialty}}
+LANR: {{DE_LANR:lanr}}

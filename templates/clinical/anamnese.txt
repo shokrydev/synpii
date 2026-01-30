@@ -1,0 +1,7 @@
+Der {{AGE:age}} Patient {{PERSON:patient}} aus {{LOCATION:city}} stellte sich am {{DATE_TIME:admission}} in unserer {{non_pii:department}} vor. {{non_pii:patient_ref}} berichtet über seit {{non_pii:symptom_duration}} bestehende Beschwerden. Die Überweisung erfolgte durch {{PERSON:referring_doctor}} aus der {{ORGANIZATION:referring_practice}}.
+
+Eigenanamnese: {{non_pii:patient_ref}} gibt an, dass die Beschwerden erstmals während eines Aufenthalts in {{LOCATION:vacation_city}} auftraten. Vorerkrankungen: arterielle Hypertonie seit {{non_pii:diagnosis_year}}, Diabetes mellitus Typ 2.
+
+Familienanamnese: Die Ehefrau {{PERSON:spouse}} begleitet den Patienten. Sie berichtet, dass auch der Vater des Patienten unter ähnlichen Beschwerden litt.
+
+Sozialanamnese: {{non_pii:patient_ref}} ist von Beruf {{non_pii:occupation}}, wohnhaft in {{LOCATION:street}}, {{DE_POSTAL_CODE:plz}} {{LOCATION:city}}. Telefonisch erreichbar unter {{PHONE_NUMBER:phone}}.

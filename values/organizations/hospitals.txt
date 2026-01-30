@@ -1,0 +1,41 @@
+# German hospital name patterns
+# Format: prefix or full name
+Universitätsklinikum
+Klinikum
+Krankenhaus
+Charité
+Helios Klinikum
+Asklepios Klinik
+Vivantes Klinikum
+Sana Klinikum
+Rhön-Klinikum
+Städtisches Klinikum
+Kreiskrankenhaus
+Bezirkskrankenhaus
+Evangelisches Krankenhaus
+Katholisches Krankenhaus
+Diakoniekrankenhaus
+St. Elisabeth-Krankenhaus
+St. Josef-Krankenhaus
+St. Maria-Krankenhaus
+St. Johannes-Krankenhaus
+St. Hedwig-Krankenhaus
+St. Franziskus-Hospital
+St. Antonius-Hospital
+St. Vinzenz-Krankenhaus
+Marienhospital
+Johanniter-Krankenhaus
+Malteser Krankenhaus
+BG Klinikum
+Berufsgenossenschaftliches Unfallkrankenhaus
+Herzzentrum
+Krebszentrum
+Lungenklinik
+Rheumaklinik
+Neurologische Klinik
+Psychiatrische Klinik
+Kinderklinik
+Frauenklinik
+Augenklinik
+HNO-Klinik
+Orthopädische Klinik

@@ -1,0 +1,44 @@
+# German medical diagnoses
+Arterielle Hypertonie
+Diabetes mellitus Typ 2
+Diabetes mellitus Typ 1
+KHK (Koronare Herzkrankheit)
+COPD
+Herzinsuffizienz NYHA II
+Herzinsuffizienz NYHA III
+Vorhofflimmern
+Pneumonie
+Appendizitis
+Cholezystitis
+Lumboischialgie
+Gonarthrose
+Coxarthrose
+Depression
+Anämie
+Hypothyreose
+Hyperthyreose
+Gastritis
+Refluxösophagitis
+Asthma bronchiale
+Chronische Bronchitis
+Niereninsuffizienz
+Leberzirrhose
+Pankreatitis
+Colitis ulcerosa
+Morbus Crohn
+Rheumatoide Arthritis
+Multiple Sklerose
+Morbus Parkinson
+Epilepsie
+Migräne
+Schlaganfall
+Herzinfarkt
+Lungenembolie
+Tiefe Beinvenenthrombose
+Sepsis
+Harnwegsinfekt
+Nierensteine
+Gallensteine
+Bandscheibenvorfall
+Fraktur
+Gehirnerschütterung

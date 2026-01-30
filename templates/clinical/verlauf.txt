@@ -1,0 +1,14 @@
+{{DATE_TIME:date}} - Visite
+
+Patient: {{PERSON:patient}}, geb. {{DATE_TIME:birth}}
+Station: {{non_pii:ward}}
+Behandelnder Arzt: {{PERSON:attending_doctor}}
+
+Aktueller Zustand: {{non_pii:patient_ref}} zeigt sich heute in stabilem Allgemeinzustand. RR {{non_pii:bp_systolic}}/{{non_pii:bp_diastolic}} mmHg, Puls {{non_pii:pulse}}/min. Keine Beschwerden. Die Wunde am {{non_pii:wound_location}} ist reizlos.
+
+Procedere: Weiterführung der Therapie. Geplante Entlassung am {{DATE_TIME:discharge}}. Ambulante Weiterbehandlung durch {{PERSON:followup_doctor}} in {{LOCATION:followup_city}}.
+
+Angehörigengespräch mit {{PERSON:family_member}} geführt. Kontaktdaten hinterlegt: {{PHONE_NUMBER:family_phone}}.
+
+gez. {{PERSON:attending_doctor}}
+LANR: {{DE_LANR:lanr}}

@@ -1,0 +1,31 @@
+OP-Bericht
+
+Datum: {{DATE_TIME:date}}
+Patient: {{PERSON:patient}}, geb. {{DATE_TIME:birth}}
+Versichertennummer: {{DE_KVNR:kvnr}}
+
+Eingriff: Operative Versorgung
+
+Operateur: {{PERSON:attending_doctor}}
+Assistenz: {{PERSON:assistant_doctor}}
+Anästhesie: ITN
+
+Indikation:
+{{non_pii:diagnosis}}
+
+OP-Verlauf:
+Komplikationsloser Eingriff. Hautschnitt {{non_pii:wound_location}}. Präparation in typischer Weise.
+Wundverschluss schichtweise. Steriler Verband.
+
+Procedere:
+- Thromboseprophylaxe
+- Schmerztherapie nach Schema
+- Mobilisation ab 1. postoperativer Tag
+- Fadenzug in 10-12 Tagen
+
+Bei Komplikationen: {{PHONE_NUMBER:hospital_phone}}
+
+{{PERSON:attending_doctor}}
+{{non_pii:specialty}}
+{{ORGANIZATION:hospital}}
+LANR: {{DE_LANR:lanr}}, BSNR: {{DE_BSNR:bsnr}}

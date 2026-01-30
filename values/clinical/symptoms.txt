@@ -1,0 +1,41 @@
+# German medical symptoms
+Brustschmerzen
+Atemnot
+Schwindel
+Übelkeit
+Kopfschmerzen
+Rückenschmerzen
+Gelenkschmerzen
+Müdigkeit
+Herzrasen
+Appetitlosigkeit
+Fieber
+Husten
+Schnupfen
+Halsschmerzen
+Bauchschmerzen
+Durchfall
+Verstopfung
+Erbrechen
+Gewichtsverlust
+Gewichtszunahme
+Schlafstörungen
+Konzentrationsstörungen
+Sehstörungen
+Hörstörungen
+Taubheitsgefühl
+Kribbeln
+Lähmungserscheinungen
+Sprachstörungen
+Bewusstlosigkeit
+Ohnmacht
+Krampfanfälle
+Hautausschlag
+Juckreiz
+Schwellungen
+Wassereinlagerungen
+Blutungen
+Blut im Stuhl
+Blut im Urin
+Nachtschweiß
+Leistungsminderung

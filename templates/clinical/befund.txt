@@ -1,0 +1,20 @@
+Befundbericht
+
+Patient: {{PERSON:patient}}
+Geburtsdatum: {{DATE_TIME:birth}}
+Versichertennummer: {{DE_KVNR:kvnr}}
+Untersuchungsdatum: {{DATE_TIME:exam}}
+
+Klinische Angaben: {{AGE:age}} Patient mit V.a. {{non_pii:diagnosis}}. Zugewiesen von {{PERSON:referring_doctor}}, {{ORGANIZATION:referring_practice}}, {{LOCATION:referring_city}}.
+
+Befund: {{non_pii:finding}}
+
+Beurteilung: {{non_pii:assessment}}
+
+Empfehlung: Kontrolluntersuchung in {{non_pii:followup_weeks}} Wochen. Bei Fragen erreichen Sie uns unter {{PHONE_NUMBER:hospital_phone}} oder per E-Mail {{EMAIL_ADDRESS:hospital_email}}.
+
+{{PERSON:attending_doctor}}
+Facharzt für {{non_pii:specialty}}
+{{ORGANIZATION:hospital}}
+{{LOCATION:hospital_street}}, {{DE_POSTAL_CODE:hospital_plz}} {{LOCATION:hospital_city}}
+BSNR: {{DE_BSNR:bsnr}}
