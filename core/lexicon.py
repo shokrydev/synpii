@@ -3,8 +3,10 @@
 Provides:
 - ValueLoader: Generic file-based value loading with metadata support
 - GermanLexicon: German-specific lexicon with gender/case agreement
+- Frequency-weighted sampling with Zipfian distribution support
 """
 
+import math
 import random
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Any, Union
@@ -126,6 +128,79 @@ class ValueLoader:
         """Clear the internal cache."""
         self._cache.clear()
 
+    def sample_zipfian(self, path: str, s: float = 1.0) -> str:
+        """Sample using Zipfian distribution (common values appear more frequently).
+
+        Zipf's law: frequency ∝ 1/rank^s
+
+        Args:
+            path: Relative path to values file.
+            s: Zipf exponent (default 1.0). Higher = steeper distribution.
+
+        Returns:
+            Value sampled with Zipfian probability.
+        """
+        values = self.load(path, with_metadata=False)
+        if not values:
+            return None
+
+        n = len(values)
+        # Compute Zipfian weights: 1/i^s for i=1..n
+        weights = [1.0 / math.pow(i, s) for i in range(1, n + 1)]
+        total_weight = sum(weights)
+
+        # Weighted selection
+        r = random.random() * total_weight
+        cumulative = 0.0
+        for value, weight in zip(values, weights):
+            cumulative += weight
+            if r <= cumulative:
+                return value
+
+        return values[-1]
+
+    def sample_with_explicit_weights(
+        self, path: str, weight_index: int = 1
+    ) -> Tuple[str, List[str]]:
+        """Sample using explicit weights from file, returning value and all metadata.
+
+        Args:
+            path: Relative path to values file.
+            weight_index: Index of weight in metadata.
+
+        Returns:
+            Tuple of (selected_value, full_metadata_list).
+        """
+        values = self.load(path, with_metadata=True)
+        if not values:
+            return None, []
+
+        # Parse weights
+        weighted_values = []
+        for item in values:
+            value = item[0]
+            try:
+                weight = float(item[weight_index]) if len(item) > weight_index else 1.0
+            except (ValueError, IndexError):
+                weight = 1.0
+            weighted_values.append((value, weight, item))
+
+        # Weighted selection
+        total_weight = sum(w for _, w, _ in weighted_values)
+        if total_weight == 0:
+            choice = random.choice(weighted_values)
+            return choice[0], choice[2]
+
+        r = random.random() * total_weight
+        cumulative = 0.0
+        for value, weight, item in weighted_values:
+            cumulative += weight
+            if r <= cumulative:
+                return value, item
+
+        last = weighted_values[-1]
+        return last[0], last[2]
+
 
 class GermanLexicon:
     """German-specific lexicon with grammar awareness.
@@ -174,20 +249,28 @@ class GermanLexicon:
         "beim": "dative", "vom": "dative",
     }
 
-    def __init__(self, values_dir: Path):
+    def __init__(self, values_dir: Path, use_weighted_sampling: bool = True):
         """Initialize lexicon.
 
         Args:
             values_dir: Path to values directory.
+            use_weighted_sampling: If True, use frequency-weighted sampling
+                for names and cities. If False, use uniform random.
         """
         self.values_dir = Path(values_dir)
         self.loader = ValueLoader(values_dir)
+        self.use_weighted_sampling = use_weighted_sampling
+
+        # Zipf exponent for name sampling (s=1.0 is classic Zipf)
+        # Using s=0.7 for more realistic name distribution
+        self.zipf_exponent = 0.7
 
         # Cache for loaded values
         self._first_names_male: List[str] = None
         self._first_names_female: List[str] = None
         self._last_names: List[str] = None
         self._cities: List[Tuple[str, str, str]] = None
+        self._cities_weighted: List[Tuple[str, str, str, float]] = None
         self._street_names: List[str] = None
         self._street_suffixes: List[str] = None
         self._location_nouns: List[Dict[str, Any]] = None
@@ -394,8 +477,45 @@ class GermanLexicon:
 
     # --- Sampling helpers ---
 
+    def _zipfian_choice(self, items: List, s: float = None) -> Any:
+        """Choose from list using Zipfian distribution.
+
+        Items at the beginning of the list are more likely to be chosen.
+
+        Args:
+            items: List to sample from.
+            s: Zipf exponent (uses self.zipf_exponent if None).
+
+        Returns:
+            Selected item.
+        """
+        if not items:
+            return None
+
+        if not self.use_weighted_sampling:
+            return random.choice(items)
+
+        s = s if s is not None else self.zipf_exponent
+        n = len(items)
+
+        # Compute Zipfian weights: 1/i^s for i=1..n
+        weights = [1.0 / math.pow(i, s) for i in range(1, n + 1)]
+        total_weight = sum(weights)
+
+        # Weighted selection
+        r = random.random() * total_weight
+        cumulative = 0.0
+        for item, weight in zip(items, weights):
+            cumulative += weight
+            if r <= cumulative:
+                return item
+
+        return items[-1]
+
     def sample_first_name(self, gender: str = None) -> str:
-        """Sample a random first name.
+        """Sample a first name with Zipfian frequency distribution.
+
+        Common names (earlier in file) are more likely to be chosen.
 
         Args:
             gender: 'male', 'female', or None for random.
@@ -407,22 +527,74 @@ class GermanLexicon:
             gender = random.choice(["male", "female"])
 
         if gender == "male":
-            return random.choice(self.first_names_male)
+            return self._zipfian_choice(self.first_names_male)
         else:
-            return random.choice(self.first_names_female)
+            return self._zipfian_choice(self.first_names_female)
 
     def sample_last_name(self) -> str:
-        """Sample a random last name."""
-        return random.choice(self.last_names)
+        """Sample a last name with Zipfian frequency distribution."""
+        return self._zipfian_choice(self.last_names)
 
     def sample_city(self) -> Tuple[str, str, str]:
-        """Sample a city with PLZ range: (name, plz_min, plz_max)."""
-        return random.choice(self.cities)
+        """Sample a city with population-weighted probability.
+
+        Larger cities are more likely to be chosen.
+
+        Returns:
+            Tuple of (name, plz_min, plz_max).
+        """
+        if not self.use_weighted_sampling:
+            return random.choice(self.cities)
+
+        # Use Zipfian on cities (assumed sorted by population)
+        return self._zipfian_choice(self.cities)
+
+    def sample_city_weighted(self) -> Tuple[str, str, str]:
+        """Sample a city using explicit population weights if available.
+
+        Falls back to Zipfian if no weights in file.
+
+        Returns:
+            Tuple of (name, plz_min, plz_max).
+        """
+        # Try to use explicit weights from column 4 if available
+        if self._cities_weighted is None:
+            try:
+                raw = self.loader.load("locations/cities.txt", with_metadata=True)
+                self._cities_weighted = []
+                for item in raw:
+                    if len(item) >= 4:
+                        try:
+                            weight = float(item[3])
+                        except ValueError:
+                            weight = 1.0
+                    else:
+                        weight = 1.0
+                    self._cities_weighted.append(
+                        (item[0], item[1], item[2], weight)
+                    )
+            except FileNotFoundError:
+                self._cities_weighted = []
+
+        if self._cities_weighted:
+            # Weighted selection
+            total = sum(c[3] for c in self._cities_weighted)
+            r = random.random() * total
+            cumulative = 0.0
+            for city in self._cities_weighted:
+                cumulative += city[3]
+                if r <= cumulative:
+                    return (city[0], city[1], city[2])
+            last = self._cities_weighted[-1]
+            return (last[0], last[1], last[2])
+
+        # Fall back to Zipfian
+        return self.sample_city()
 
     def sample_street_name(self) -> str:
-        """Sample a street name prefix."""
-        return random.choice(self.street_names)
+        """Sample a street name prefix with Zipfian distribution."""
+        return self._zipfian_choice(self.street_names)
 
     def sample_street_suffix(self) -> str:
-        """Sample a street suffix."""
-        return random.choice(self.street_suffixes)
+        """Sample a street suffix with Zipfian distribution."""
+        return self._zipfian_choice(self.street_suffixes)

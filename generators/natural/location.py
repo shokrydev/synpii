@@ -1,10 +1,10 @@
-"""Location generator with PCFG-based German street names."""
+"""Location generator with German street names."""
 
 import random
 from typing import Optional, Tuple
 
 from synpii.core.types import Entity
-from synpii.core.grammar import PCFGEngine, create_street_generator
+from synpii.core.grammar import GermanStreetGenerator
 from synpii.generators.base import BaseGenerator
 
 
@@ -12,19 +12,12 @@ class LocationGenerator(BaseGenerator):
     """Generate German location entities.
 
     Supports:
-    - Street addresses with PCFG-based name generation
+    - Street addresses with proper compound word formation
     - City names
     - Full addresses (street + PLZ + city)
     """
 
     entity_types = ["LOCATION"]
-
-    # Street prepositional prefixes for simple generation
-    STREET_PREFIXES = [
-        "Am", "An der", "An den", "Auf der", "Auf dem", "Im", "In der",
-        "Unter den", "Zum", "Zur", "Bei der", "Beim", "Vor dem", "Vor der",
-        "Hinter dem", "Hinter der", "Neben der", "Neben dem",
-    ]
 
     STREET_SUFFIXES = [
         "straße", "weg", "allee", "platz", "ring", "gasse", "damm", "ufer",
@@ -33,23 +26,21 @@ class LocationGenerator(BaseGenerator):
 
     HOSPITAL_SUFFIXES = ["Mitte", "Nord", "Süd", "Ost", "West", "Zentrum", "Campus"]
 
-    def __init__(self, lexicon=None, use_pcfg: bool = True, **kwargs):
+    def __init__(self, lexicon=None, **kwargs):
         """Initialize location generator.
 
         Args:
             lexicon: GermanLexicon for values.
-            use_pcfg: Use PCFG for street generation (recommended).
             **kwargs: Additional parameters.
         """
         super().__init__(lexicon, **kwargs)
-        self.use_pcfg = use_pcfg
         self._street_generator = None
 
     @property
-    def street_generator(self) -> PCFGEngine:
-        """Lazy-load PCFG street generator."""
+    def street_generator(self) -> GermanStreetGenerator:
+        """Lazy-load street generator."""
         if self._street_generator is None:
-            self._street_generator = create_street_generator(self.lexicon)
+            self._street_generator = GermanStreetGenerator(self.lexicon)
         return self._street_generator
 
     def generate(
@@ -77,14 +68,8 @@ class LocationGenerator(BaseGenerator):
 
     def _generate_street(self, with_house_number: bool = True, **kwargs) -> Entity:
         """Generate a street name."""
-        if self.use_pcfg:
-            # Use PCFG for realistic street generation
-            street_name = self.street_generator.expand("STREET")
-            # Clean up spacing (PCFG adds spaces between parts)
-            street_name = self._clean_street_name(street_name)
-        else:
-            # Simple generation
-            street_name = self._generate_simple_street()
+        # Use the specialized German street generator
+        street_name = self.street_generator.generate()
 
         # Add house number
         if with_house_number:
@@ -100,7 +85,10 @@ class LocationGenerator(BaseGenerator):
         variants = [full_street]
         if house_number:
             variants.append(street_name)  # Without number
-        variants.append(street_name.replace("straße", "str.").replace("Straße", "Str."))
+        # Add abbreviated variant
+        abbrev = street_name.replace("straße", "str.").replace("Straße", "Str.")
+        if abbrev != street_name:
+            variants.append(abbrev if not house_number else f"{abbrev} {house_number}")
 
         return Entity(
             entity_type="LOCATION",
@@ -112,54 +100,6 @@ class LocationGenerator(BaseGenerator):
                 "location_type": "street",
             },
         )
-
-    def _clean_street_name(self, name: str) -> str:
-        """Clean up PCFG-generated street name.
-
-        Handles:
-        - Removing extra spaces
-        - Joining compound parts (e.g., "Goethe straße" -> "Goethestraße")
-        - Fixing hyphenated compound names
-        """
-        # Fix compound hyphens (remove spaces around hyphens in compound names)
-        name = name.replace(" - ", "-")
-
-        # Join suffix to name (remove space before suffix)
-        for suffix in self.STREET_SUFFIXES:
-            name = name.replace(f" {suffix}", suffix)
-            name = name.replace(f" {suffix.capitalize()}", suffix.capitalize())
-            # Also handle hyphenated suffixes
-            name = name.replace(f"-{suffix}", suffix)
-            name = name.replace(f"-{suffix.capitalize()}", suffix.capitalize())
-
-        # Handle genitive 's' and 'ens'
-        name = name.replace(" s ", "s")
-        name = name.replace(" ens ", "ens")
-        name = name.replace(" s", "s")  # End of string
-
-        # Clean double spaces
-        while "  " in name:
-            name = name.replace("  ", " ")
-
-        return name.strip()
-
-    def _generate_simple_street(self) -> str:
-        """Generate a simple street name without PCFG."""
-        if self.lexicon is not None and self.lexicon.street_names:
-            prefix = random.choice(self.lexicon.street_names)
-        else:
-            prefix = random.choice([
-                "Haupt", "Schiller", "Goethe", "Beethoven", "Mozart", "Bach",
-                "Park", "Wald", "Berg", "Kirch", "Markt", "Schloss", "Rosen",
-                "Linden", "Friedrichs", "Bahnhof", "Garten",
-            ])
-
-        if self.lexicon is not None and self.lexicon.street_suffixes:
-            suffix = random.choice(self.lexicon.street_suffixes)
-        else:
-            suffix = random.choice(self.STREET_SUFFIXES)
-
-        return f"{prefix}{suffix}"
 
     def _generate_city(self, **kwargs) -> Entity:
         """Generate a city name."""

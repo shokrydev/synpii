@@ -12,6 +12,7 @@ from typing import Dict, List, Optional, Tuple, Any
 from synpii.core.types import Entity, Annotation, GeneratedDocument
 from synpii.core.lexicon import GermanLexicon
 from synpii.core.span_tracker import track_template_replacement
+from synpii.core.context import DocumentContext
 from synpii.generators.base import GeneratorRegistry
 from synpii.generators.clinical.content import ClinicalContentGenerator
 
@@ -136,12 +137,32 @@ class TemplateEngine:
         """
         context: Dict[str, Tuple[str, Optional[str]]] = {}
 
+        # Generate document context for temporal consistency
+        doc_ctx = DocumentContext.generate()
+        self._current_doc_context = doc_ctx
+
+        # Pre-populate date/age context from DocumentContext
+        # These ensure birth dates, ages, and admission dates are consistent
+        date_context = {
+            "birth": (doc_ctx.birth_date_str, "DATE_TIME"),
+            "age": (doc_ctx.age_description, "AGE"),
+            "date": (doc_ctx.document_date_str, "DATE_TIME"),
+            "admission": (doc_ctx.admission_date_str, "DATE_TIME") if doc_ctx.admission_date_str else None,
+            "discharge": (doc_ctx.discharge_date_str, "DATE_TIME") if doc_ctx.discharge_date_str else None,
+            "exam": (doc_ctx.exam_date_str, "DATE_TIME") if doc_ctx.exam_date_str else None,
+        }
+
+        # Add date context entries that exist
+        for key, value in date_context.items():
+            if value is not None:
+                context[key] = value
+
         # Find all placeholders
         for match in self.PLACEHOLDER_PATTERN.finditer(template):
             placeholder_type = match.group(1)
             placeholder_name = match.group(2) or placeholder_type
 
-            # Skip if already generated (named placeholders reuse)
+            # Skip if already generated (named placeholders reuse, or from doc_ctx)
             if placeholder_name in context:
                 continue
 
@@ -178,23 +199,29 @@ class TemplateEngine:
                     # Extract last name and add salutation
                     parts = base_value.split()
                     last_name = parts[-1] if parts else base_value
-                    # Determine gender from first name if possible
-                    salutation = random.choice(["Herr", "Frau"])
+                    # Use document context gender if available
+                    if hasattr(self, '_current_doc_context') and self._current_doc_context:
+                        salutation = self._current_doc_context.patient_salutation
+                    else:
+                        salutation = random.choice(["Herr", "Frau"])
                     return f"{salutation} {last_name}", None  # Not PII itself
             return placeholder_name, None
 
-        # Handle entity types
-        if generators and generators.is_available(placeholder_type):
-            entity = generators.generate(placeholder_type)
-            return entity.value, placeholder_type
-
-        # Handle special cases
+        # Handle special cases for PERSON with context-aware gender
         if placeholder_type == "PERSON" and generators:
             if "doctor" in placeholder_name.lower():
                 entity = generators.generate("PERSON", with_title=True, title_type="medical")
+            elif placeholder_name == "patient" and hasattr(self, '_current_doc_context'):
+                # Use document context gender for patient
+                entity = generators.generate("PERSON", gender=self._current_doc_context.gender)
             else:
                 entity = generators.generate("PERSON")
             return entity.value, "PERSON"
+
+        # Handle other entity types
+        if generators and generators.is_available(placeholder_type):
+            entity = generators.generate(placeholder_type)
+            return entity.value, placeholder_type
 
         # Fallback to non-PII
         return self._generate_non_pii(placeholder_name), None

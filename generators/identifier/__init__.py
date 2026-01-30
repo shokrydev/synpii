@@ -8,6 +8,14 @@ from synpii.generators.identifier.healthcare import (
 )
 from synpii.generators.identifier.financial import IBANGenerator
 from synpii.generators.identifier.postal import PostalCodeGenerator
+from synpii.generators.identifier.government import (
+    TaxIDGenerator,
+    PersonalIDGenerator,
+    SocialSecurityGenerator,
+    PassportGenerator,
+    DriverLicenseGenerator,
+    LicensePlateGenerator,
+)
 
 __all__ = [
     "KVNRGenerator",
@@ -16,4 +24,10 @@ __all__ = [
     "TelematikIDGenerator",
     "IBANGenerator",
     "PostalCodeGenerator",
+    "TaxIDGenerator",
+    "PersonalIDGenerator",
+    "SocialSecurityGenerator",
+    "PassportGenerator",
+    "DriverLicenseGenerator",
+    "LicensePlateGenerator",
 ]

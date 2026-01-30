@@ -51,9 +51,9 @@ def test_core_types():
 
 
 def test_pcfg_grammar():
-    """Test PCFG engine."""
+    """Test PCFG engine and street generator."""
     print("Testing PCFG grammar...")
-    from synpii.core.grammar import PCFGEngine, create_street_generator
+    from synpii.core.grammar import PCFGEngine, GermanStreetGenerator
 
     # Simple grammar
     grammar = {
@@ -69,10 +69,10 @@ def test_pcfg_grammar():
     assert result in ["hello world", "world hello"]
     print(f"  ✓ Simple grammar: '{result}'")
 
-    # Street generator
-    street_gen = create_street_generator()
+    # Street generator (specialized, not PCFG-based)
+    street_gen = GermanStreetGenerator()
     for _ in range(3):
-        street = street_gen.expand("STREET")
+        street = street_gen.generate()
         print(f"  ✓ Street: '{street}'")
 
     print("PCFG grammar: PASSED\n")

@@ -101,6 +101,12 @@ class GeneratorRegistry:
             TelematikIDGenerator,
             IBANGenerator,
             PostalCodeGenerator,
+            TaxIDGenerator,
+            PersonalIDGenerator,
+            SocialSecurityGenerator,
+            PassportGenerator,
+            DriverLicenseGenerator,
+            LicensePlateGenerator,
         )
         from synpii.generators.natural import (
             PersonGenerator,
@@ -114,12 +120,22 @@ class GeneratorRegistry:
 
         # Register each generator
         generators = [
+            # Healthcare identifiers
             KVNRGenerator,
             LANRGenerator,
             BSNRGenerator,
             TelematikIDGenerator,
+            # Financial identifiers
             IBANGenerator,
             PostalCodeGenerator,
+            # Government identifiers
+            TaxIDGenerator,
+            PersonalIDGenerator,
+            SocialSecurityGenerator,
+            PassportGenerator,
+            DriverLicenseGenerator,
+            LicensePlateGenerator,
+            # Natural language entities
             PersonGenerator,
             LocationGenerator,
             DateGenerator,

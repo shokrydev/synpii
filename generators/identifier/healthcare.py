@@ -24,40 +24,53 @@ class KVNRGenerator(BaseGenerator):
 
     The checksum algorithm (per §290 SGB V):
     1. Convert letter to 2-digit number (A=01...Z=26)
-    2. Create 11-digit number: [2 letter digits] + [8 random] + [check]
-    3. Apply weights 1,2,1,2,... and sum cross-sums
-    4. total % 10 must equal the check digit
+    2. Create 11-digit number: [2 letter digits] + [8 random digits] + [check]
+    3. Apply weights 1,2,1,2,... and sum cross-sums of products
+    4. The sum (including check digit) modulo 10 must equal check digit
+
+    This requires the partial sum (without check digit) to be divisible by 10.
     """
 
     entity_types = ["DE_KVNR"]
 
+    # Cross-sum of d*2 for d in 0-9
+    CROSS_SUMS_WEIGHT2 = [0, 2, 4, 6, 8, 1, 3, 5, 7, 9]
+
+    @staticmethod
+    def _cross_sum(n: int) -> int:
+        """Calculate cross-sum (digit sum) of a number."""
+        return sum(int(d) for d in str(n))
+
     def generate(self, **kwargs) -> Entity:
         """Generate a valid KVNR."""
         letter = random.choice(string.ascii_uppercase)
-        digits = [random.randint(0, 9) for _ in range(8)]
 
+        # Generate first 7 random digits
+        digits = [random.randint(0, 9) for _ in range(7)]
+
+        # Convert letter to 2-digit number (A=01, B=02, ..., Z=26)
         letter_num = ord(letter) - ord('A') + 1
-        all_digits = [letter_num // 10, letter_num % 10] + digits
 
-        def cross_sum(n):
-            return sum(int(d) for d in str(n))
+        # Calculate partial sum for first 9 positions
+        # Positions: 0=letter_tens, 1=letter_ones, 2-8=digits[0-6]
+        # Weights:   1,           2,             1,2,1,2,1,2,1
+        partial_sum = 0
+        partial_sum += self._cross_sum((letter_num // 10) * 1)  # pos 0
+        partial_sum += self._cross_sum((letter_num % 10) * 2)   # pos 1
+        for i, d in enumerate(digits):  # pos 2-8
+            weight = 2 if (i + 2) % 2 == 1 else 1
+            partial_sum += self._cross_sum(d * weight)
 
-        total = 0
-        for i, d in enumerate(all_digits):
-            weight = 2 if i % 2 == 1 else 1
-            total += cross_sum(d * weight)
+        # Position 9 has weight 2. Find digit that makes total sum % 10 == 0
+        needed = (10 - partial_sum % 10) % 10
+        # Find d8 such that cross_sum(d8 * 2) == needed
+        d8 = self.CROSS_SUMS_WEIGHT2.index(needed)
+        digits.append(d8)
 
-        # Adjust last digit to make total % 10 == 0
-        remainder = total % 10
-        if remainder != 0:
-            old_contrib = cross_sum(digits[7] * 2)
-            for new_d in range(10):
-                new_contrib = cross_sum(new_d * 2)
-                if (total - old_contrib + new_contrib) % 10 == 0:
-                    digits[7] = new_d
-                    break
-
+        # Now S10 % 10 == 0, so any check digit D satisfies (S10 + D) % 10 == D
+        # By convention, set check digit to 0 (or we could use total % 10)
         check_digit = 0
+
         kvnr = letter + ''.join(map(str, digits)) + str(check_digit)
 
         return Entity(
