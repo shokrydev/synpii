@@ -7,7 +7,7 @@ Key features:
 - German grammar awareness (gender, case, article agreement)
 - Adversarial perturbation pipelines (OCR, BPE, corruption)
 - Guaranteed span alignment through deterministic perturbation tracking
-- Weakness-targeted generation API for research automation
+- Adversarial scenario generation API for research automation
 """
 
 from synpii.core.types import (
@@ -117,6 +117,7 @@ class SynPII:
         self._lexicon = None
         self._template_engine = None
         self._generators = None
+        self._adversarial_generator = None
         self._perturbation_pipeline = None
 
     @property
@@ -148,6 +149,18 @@ class SynPII:
                 entity_types=self.config.get("entity_types", []),
             )
         return self._generators
+
+    @property
+    def adversarial_generator(self):
+        """Lazy-load adversarial scenario generator."""
+        if self._adversarial_generator is None:
+            from synpii.adversarial.generator import AdversarialGenerator
+            self._adversarial_generator = AdversarialGenerator(
+                generators=self.generators,
+                lexicon=self.lexicon,
+                template_engine=self.template_engine,
+            )
+        return self._adversarial_generator
 
     @property
     def perturbation_pipeline(self):

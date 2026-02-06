@@ -1,0 +1,15 @@
+[project]
+name = "synpii"
+version = "0.1.0"
+description = "Synthetic PII Generator"
+dependencies = [
+    "faker",
+]
+
+[tool.setuptools]
+packages = ["synpii"]
+package-dir = {"synpii" = "."}
+
+[build-system]
+requires = ["setuptools>=64.0"]
+build-backend = "setuptools.build_meta"

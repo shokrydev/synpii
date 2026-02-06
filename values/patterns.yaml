@@ -1,0 +1,67 @@
+# SynPII Adversarial Patterns
+# Use {{placeholder}} syntax for entity injection
+
+overlap_patterns:
+  # DE_POSTAL_CODE vs LOCATION
+  postal_location:
+    - "{{DE_POSTAL_CODE}} {{LOCATION}}"
+    - "{{DE_POSTAL_CODE}}, {{LOCATION}}"
+    - "PLZ {{DE_POSTAL_CODE}} in {{LOCATION}}"
+    - "{{LOCATION}}, PLZ: {{DE_POSTAL_CODE}}"
+    - "Postleitzahl {{DE_POSTAL_CODE}}"
+  
+  # PERSON vs LOCATION (streets)
+  person_location:
+    - "{{PERSON}}straße"
+    - "{{PERSON}}platz"
+    - "Straße {{PERSON}}"
+
+  # DATE_TIME vs PHONE_NUMBER
+  date_phone:
+    - "01.{{PHONE_NUMBER}}"
+
+format_variations:
+  DATE_TIME:
+    standard: "{{day:02d}}.{{month:02d}}.{{year}}"
+    no_leading_zero: "{{day}}.{{month}}.{{year}}"
+    slash: "{{day:02d}}/{{month:02d}}/{{year}}"
+    dash: "{{day:02d}}-{{month:02d}}-{{year}}"
+    text_month: "{{day}}. {{month_name}} {{year}}"
+    iso: "{{year}}-{{month:02d}}-{{day:02d}}"
+  
+  PHONE_NUMBER:
+    standard: "{{area}} {{n1}} {{n2}}"
+    compact: "{{area}}{{num}}"
+    dashes: "{{area}}-{{n1}}-{{n2}}"
+    international: "+49 {{area_short}} {{num}}"
+    parentheses: "({{area}}) {{num}}"
+  
+  DE_KVNR:
+    standard: "{{kvnr}}"
+    labeled: "KVNR: {{kvnr}}"
+    spaced: "{{letter}} {{digits}}"
+
+context_patterns:
+  DE_KVNR:
+    with_label: "Versichertennummer: {{value}}"
+    with_abbr: "KVNR: {{value}}"
+    no_context: "{{value}}"
+    sentence: "Die Versichertennummer lautet {{value}}"
+  
+  DATE_TIME:
+    with_label: "Geburtsdatum: {{value}}"
+    with_geb: "geb. {{value}}"
+    no_context: "{{value}}"
+    sentence: "Der Patient wurde am {{value}} geboren"
+  
+  PHONE_NUMBER:
+    with_label: "Telefon: {{value}}"
+    with_abbr: "Tel.: {{value}}"
+    no_context: "{{value}}"
+    sentence: "Erreichbar unter {{value}}"
+
+confusion_patterns:
+  PERSON_ORGANIZATION:
+    - "Dr. {{last_name}}"
+    - "Praxis {{last_name}}"
+    - "{{last_name}} GmbH"

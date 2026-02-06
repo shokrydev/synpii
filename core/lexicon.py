@@ -10,6 +10,7 @@ import math
 import random
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Any, Union
+import yaml
 
 
 class ValueLoader:
@@ -280,6 +281,7 @@ class GermanLexicon:
         self._occupations: List[str] = None
         self._insurance_companies: List[str] = None
         self._medications: List[str] = None
+        self._patterns: Dict[str, Any] = None
 
     # --- Name properties ---
 
@@ -405,6 +407,22 @@ class GermanLexicon:
             except FileNotFoundError:
                 self._insurance_companies = []
         return self._insurance_companies
+
+    @property
+    def patterns(self) -> Dict[str, Any]:
+        """Load adversarial patterns from patterns.yaml."""
+        if self._patterns is None:
+            path = self.values_dir / "patterns.yaml"
+            if path.exists():
+                with open(path, "r", encoding="utf-8") as f:
+                    self._patterns = yaml.safe_load(f)
+            else:
+                self._patterns = {}
+        return self._patterns
+
+    def get_patterns(self, section: str) -> Dict[str, Any]:
+        """Get patterns for a specific section (e.g., 'overlap_patterns')."""
+        return self.patterns.get(section, {})
 
     # --- Grammar helpers ---
 

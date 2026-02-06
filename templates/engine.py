@@ -33,8 +33,9 @@ class TemplateEngine:
         Der {{non_pii:age_ref}} {{PERSON:patient_ref}} ...
     """
 
-    # Regex to match {{placeholder}} or {{type:name}}
-    PLACEHOLDER_PATTERN = re.compile(r'\{\{(\w+)(?::(\w+))?\}\}')
+    # Regex to match {{placeholder}} or {{type:name/format}}
+    # Group 1: key/type, Group 2: optional name or format spec
+    PLACEHOLDER_PATTERN = re.compile(r'\{\{(\w+)(?::([^}]+))?\}\}')
 
     # Non-PII placeholder types (content, not entities)
     NON_PII_TYPES = {
@@ -124,6 +125,31 @@ class TemplateEngine:
             annotations=annotations,
             metadata={"context_keys": list(context.keys())},
         )
+
+    def render_string(
+        self,
+        template: str,
+        generators: GeneratorRegistry = None,
+        context: Dict[str, Any] = None,
+    ) -> Tuple[str, List[Annotation]]:
+        """Render a raw template string with PII tracking.
+
+        Args:
+            template: Raw template content with {{placeholders}}.
+            generators: Generator registry for creating entities.
+            context: Pre-defined values for named placeholders.
+
+        Returns:
+            Tuple of (text, annotations).
+        """
+        # Generate missing context values
+        merged_context = self._generate_context(template, generators)
+        
+        # Override with provided context if any
+        if context:
+            merged_context.update(context)
+
+        return self._fill_template(template, merged_context)
 
     def _generate_context(
         self,
@@ -278,11 +304,33 @@ class TemplateEngine:
         replacements = []
 
         for match in self.PLACEHOLDER_PATTERN.finditer(template):
-            placeholder_type = match.group(1)
-            placeholder_name = match.group(2) or placeholder_type
+            p_first = match.group(1)
+            p_second = match.group(2)
+
+            # Determine if this is a context key with format or an entity type with name
+            # 1. Check if p_first is already in context (explicit value)
+            if p_first in context:
+                placeholder_name = p_first
+                format_spec = p_second
+            else:
+                # 2. Treat as Entity TYPE:NAME or TYPE
+                placeholder_name = p_second or p_first
+                format_spec = None
 
             if placeholder_name in context:
                 value, entity_type = context[placeholder_name]
+                
+                # Apply formatting if specifier is present
+                if format_spec:
+                    try:
+                        # Handle both string and numeric values
+                        value = format(value, format_spec)
+                    except (ValueError, TypeError):
+                        # Fallback to string if formatting fails
+                        value = str(value)
+                else:
+                    value = str(value)
+
                 replacements.append({
                     "start": match.start(),
                     "end": match.end(),

@@ -218,10 +218,10 @@ def test_synpii_main():
     print("SynPII main: PASSED\n")
 
 
-def test_weakness_targeted():
-    """Test weakness-targeted generation."""
-    print("Testing weakness-targeted generation...")
-    from synpii.weakness import WeaknessTargetedGenerator, WeaknessType, WeaknessReport
+def test_adversarial_generation():
+    """Test adversarial scenario generation."""
+    print("Testing adversarial scenario generation...")
+    from synpii.adversarial import AdversarialGenerator, AdversarialType, AdversarialScenario
     from synpii.generators import GeneratorRegistry
     from synpii.core.lexicon import GermanLexicon
     from pathlib import Path
@@ -230,23 +230,25 @@ def test_weakness_targeted():
     lexicon = GermanLexicon(values_dir)
     generators = GeneratorRegistry(lexicon=lexicon)
 
-    targeted = WeaknessTargetedGenerator(generators=generators, lexicon=lexicon)
-    print(f"  ✓ Available weakness types: {[w.value for w in targeted.available_weakness_types]}")
+    generator = AdversarialGenerator(generators=generators, lexicon=lexicon)
+    # Available recipes depend on registration, check by keys or proxy
+    available_types = generator.RECIPES.keys()
+    print(f"  ✓ Available adversarial types: {[t.value for t in available_types]}")
 
     # Generate overlap conflict cases
-    weakness = WeaknessReport(
-        weakness_type=WeaknessType.OVERLAP_CONFLICT,
+    scenario = AdversarialScenario(
+        adversarial_type=AdversarialType.OVERLAP_CONFLICT,
         entity_type="DE_POSTAL_CODE",
         description="PLZ overlaps with LOCATION",
         evidence={"conflicting_type": "LOCATION"},
     )
 
-    cases = targeted.generate_for_weakness(weakness, count=3)
-    print(f"  ✓ Generated {len(cases)} overlap conflict test cases:")
-    for case in cases:
-        print(f"    - '{case.text}'")
+    samples = generator.generate_for_scenario(scenario, count=3)
+    print(f"  ✓ Generated {len(samples)} adversarial samples:")
+    for sample in samples:
+        print(f"    - '{sample.text}'")
 
-    print("Weakness-targeted: PASSED\n")
+    print("Adversarial generation: PASSED\n")
 
 
 def test_output_formats():
@@ -297,7 +299,7 @@ def main():
         test_perturbations,
         test_template_engine,
         test_synpii_main,
-        test_weakness_targeted,
+        test_adversarial_generation,
         test_output_formats,
     ]
 

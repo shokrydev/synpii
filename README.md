@@ -1,6 +1,6 @@
 # SynPII
 
-Grammar-aware synthetic PII generation for German clinical text. Built for benchmarking PII detection systems and researching anonymization weaknesses.
+Grammar-aware synthetic PII generation for German clinical text. Built for benchmarking PII detection systems and adversarial research.
 
 ## Features
 
@@ -9,7 +9,7 @@ Grammar-aware synthetic PII generation for German clinical text. Built for bench
 - **Presidio-Compatible Checksums**: All generated identifiers pass Presidio validation (KVNR, LANR, Tax ID, etc.)
 - **Temporal Consistency**: Birth dates match ages, admission before discharge
 - **Adversarial Perturbations**: OCR noise, BPE tokenization traps, grammar corruption
-- **Weakness-Targeted Generation**: Generate test cases that expose specific detection weaknesses
+- **Adversarial Scenario Generation**: Generate test samples that target specific failure modes
 - **Zipfian Frequency Distribution**: Common names/cities appear more frequently
 
 ## Quick Start
@@ -95,27 +95,28 @@ grammar = GrammarCorruption(probability=0.3)
 grammar.apply("an der Brücke")  # "an Brücke"
 ```
 
-## Weakness-Targeted Generation
+## Adversarial Scenario Generation
 
-Generate test cases that expose specific detection weaknesses:
+Generate synthetic samples designed to identify model failure boundaries:
 
 ```python
-from synpii.weakness import WeaknessTargetedGenerator, WeaknessType, WeaknessReport
+from synpii.adversarial import AdversarialGenerator, AdversarialType, AdversarialScenario
 
-targeted = WeaknessTargetedGenerator(generators=registry, lexicon=lexicon)
+# Initialize the research generator
+adv_gen = SynPII().adversarial_generator
 
-# Generate cases where PLZ overlaps with LOCATION
-weakness = WeaknessReport(
-    weakness_type=WeaknessType.OVERLAP_CONFLICT,
+# Generate samples where PLZ overlaps with LOCATION
+scenario = AdversarialScenario(
+    adversarial_type=AdversarialType.OVERLAP_CONFLICT,
     entity_type="DE_POSTAL_CODE",
     description="PLZ overlaps with LOCATION",
     evidence={"conflicting_type": "LOCATION"},
 )
 
-cases = targeted.generate_for_weakness(weakness, count=10)
+samples = adv_gen.generate_for_scenario(scenario, count=10)
 ```
 
-Weakness types:
+Adversarial types:
 - `OVERLAP_CONFLICT` - Entity boundaries overlap with other types
 - `FORMAT_VARIATION` - Non-standard format variations
 - `CONTEXT_DEPENDENCY` - Requires specific context words
@@ -178,22 +179,20 @@ Files at the top are sampled more frequently (Zipfian distribution).
 
 ## Integration with PIIgent
 
-SynPII is designed for integration with the PIIgent Weakness Analyzer:
+SynPII is designed for integration with the PIIgent Adversarial Research agents:
 
 ```python
 from synpii import SynPII
-from synpii.weakness import WeaknessTargetedGenerator
+from synpii.adversarial import AdversarialScenario
 
 class WeaknessAnalyzer:
     def __init__(self):
         self.synpii = SynPII(preset="clinical_de")
-        self.targeted_gen = WeaknessTargetedGenerator(
-            generators=self.synpii.generators,
-            lexicon=self.synpii.lexicon,
-        )
+        self.adv_gen = self.synpii.adversarial_generator
 
-    def generate_exploration_data(self, weakness):
-        return self.targeted_gen.generate_for_weakness(weakness, count=50)
+    def generate_research_data(self, scenario_data):
+        scenario = AdversarialScenario(**scenario_data)
+        return self.adv_gen.generate_for_scenario(scenario, count=50)
 ```
 
 ## Development

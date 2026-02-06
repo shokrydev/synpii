@@ -1,41 +1,43 @@
-"""Types for weakness analysis."""
+"""Core types for adversarial scenario generation and robustness testing.
+
+Uses state-of-the-art research terminology (Adversarial NLP, Robustness Evaluation).
+"""
 
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import List, Dict, Any, Optional
 
 
-class WeaknessType(str, Enum):
-    """Types of detection weaknesses."""
+class AdversarialType(str, Enum):
+    """Types of adversarial scenarios designed to test model robustness."""
 
-    # Overlap between entity types
+    # Overlap between entity types (e.g. PLZ in LOCATION)
     OVERLAP_CONFLICT = "OVERLAP_CONFLICT"
-    # Entity format differs from expected pattern
+    # Format variation (e.g. non-standard separators)
     FORMAT_VARIATION = "FORMAT_VARIATION"
-    # Detection needs specific context words
+    # Context dependency (e.g. missing trigger words)
     CONTEXT_DEPENDENCY = "CONTEXT_DEPENDENCY"
-    # No recognizer detects this entity type
+    # Recognizer coverage gaps
     COVERAGE_GAP = "COVERAGE_GAP"
-    # Wrong entity type assigned
+    # Type confusion (e.g. PERSON vs ORGANIZATION)
     ENTITY_CONFUSION = "ENTITY_CONFUSION"
-    # PII survives anonymization
+    # Data leakage through synthetic artifacts
     LEAKAGE = "LEAKAGE"
 
 
 @dataclass
-class WeaknessReport:
-    """Report of a detected weakness.
+class AdversarialScenario:
+    """A research scenario targeting specific robustness failure modes.
 
     Attributes:
-        weakness_type: Type of weakness.
+        adversarial_type: The type of scenario to generate.
         entity_type: Primary affected entity type.
-        description: Human-readable description.
-        confidence: Confidence score (0.0-1.0).
-        evidence: Supporting evidence data.
-        suggested_fix: Optional suggestion for improvement.
+        description: Description of the research hypothesis.
+        confidence: Estimated probability of model failure (0.0-1.0).
+        evidence: Data supporting the scenario (e.g. error logs).
     """
 
-    weakness_type: WeaknessType
+    adversarial_type: AdversarialType
     entity_type: str
     description: str
     confidence: float = 0.5
@@ -44,7 +46,7 @@ class WeaknessReport:
 
     def to_dict(self) -> dict:
         return {
-            "weakness_type": self.weakness_type.value,
+            "adversarial_type": self.adversarial_type.value,
             "entity_type": self.entity_type,
             "description": self.description,
             "confidence": self.confidence,
@@ -54,38 +56,32 @@ class WeaknessReport:
 
 
 @dataclass
-class WeaknessTestCase:
-    """A test case designed to expose a specific weakness.
+class AdversarialSample:
+    """A synthetic sample designed to identify failure boundaries.
 
     Attributes:
-        text: The test text.
-        expected_entities: List of entities that should be detected.
-        weakness_type: Type of weakness being tested.
-        difficulty: Relative difficulty (1-5).
-        metadata: Additional test case metadata.
+        text: The generated text content.
+        expected_entities: Ground truth annotations.
+        adversarial_type: The failure mode being challenged.
+        difficulty: Relative difficulty based on scenario complexity (1-5).
+        metadata: Additional generation metadata.
     """
 
     text: str
     expected_entities: List[Dict[str, Any]]  # {type, start, end, text}
-    weakness_type: WeaknessType
+    adversarial_type: AdversarialType
     difficulty: int = 3
     metadata: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
-class WeaknessTestResult:
-    """Result of running a weakness test case.
+class AdversarialTestResult:
+    """Evaluation result of a model on an adversarial sample.
 
-    Attributes:
-        test_case: The test case that was run.
-        detected_entities: Entities actually detected.
-        true_positives: Correctly detected entities.
-        false_positives: Incorrectly detected entities.
-        false_negatives: Missed entities.
-        passed: Whether the test passed.
+    Matches standard robustness evaluation metrics.
     """
 
-    test_case: WeaknessTestCase
+    sample: AdversarialSample
     detected_entities: List[Dict[str, Any]]
     true_positives: int
     false_positives: int
